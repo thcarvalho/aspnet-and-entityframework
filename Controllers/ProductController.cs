@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using asptest.Models;
 using asptest.Data;
 using Microsoft.EntityFrameworkCore;
+using asptest.Repositories.Products;
 
 namespace asptest.Controllers
 {
@@ -14,45 +15,44 @@ namespace asptest.Controllers
   public class ProductController : ControllerBase
   {
     [HttpGet("")]
-    public async Task<ActionResult<List<Product>>> Get([FromServices] DataContext context)
+    public async Task<ActionResult<List<Product>>> Get(
+      [FromServices] DataContext context,
+      [FromServices] IProductRepository productRepository)
     {
-      var products = await context.Products.Include(x => x.Category).ToListAsync();
+      var products = await productRepository.List();
       return products;
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Product>> GetById([FromServices] DataContext context, int id)
+    public async Task<ActionResult<Product>> GetById(
+      [FromServices] DataContext context,
+      [FromServices] IProductRepository productRepository,
+      int id)
     {
-      var product = await context.Products
-      .Include(x => x.Category)
-      .AsNoTracking()
-      .FirstOrDefaultAsync(x => x.Id == id);
-
+      var product = await productRepository.Read(id);
       return product;
     }
 
     [HttpGet("categories/{id:int}")]
-    public async Task<ActionResult<List<Product>>> GetByCategory([FromServices] DataContext context, int id)
+    public async Task<ActionResult<List<Product>>> GetByCategory(
+      [FromServices] DataContext context, 
+      [FromServices] IProductRepository productRepository,
+      int id)
     {
-      var products = await context.Products
-      .Include(x => x.Category)
-      .AsNoTracking()
-      .Where(x => x.CategoryId == id)
-      .ToListAsync();
-
-      return products;
+      var products = await productRepository.ListByCategory(id);
+      return products;      
     }
 
     [HttpPost("")]
     public async Task<ActionResult<Product>> Post(
         [FromServices] DataContext context,
+        [FromServices] IProductRepository productRepository,
         [FromBody] Product model
     )
     {
       if (ModelState.IsValid)
       {
-        context.Products.Add(model);
-        await context.SaveChangesAsync();
+        productRepository.Save(model);
         return model;
       }
       else

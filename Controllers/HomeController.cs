@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace asptest.Controllers
 {
   [Route("v1/account")]
+  [ApiController]
   public class HomeController : ControllerBase
   {
     [HttpPost("login")]

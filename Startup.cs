@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using asptest.Data;
+using asptest.Repositories.Products;
+using asptest.Repositories.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -52,6 +54,8 @@ namespace asptest
       services.AddControllers();
       services.AddDbContext<DataContext>();
       services.AddScoped<DataContext, DataContext>();
+      services.AddTransient<IUserRepository, UserRepository>();
+      services.AddTransient<IProductRepository, ProductRepository>();
       services.AddSwaggerGen(c =>
       {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "asptest", Version = "v1" });
